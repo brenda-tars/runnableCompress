@@ -44,7 +44,8 @@ if ! command -v zstd >/dev/null 2>&1; then
 fi
 
 # 3. 读取版本号并清理可能存在的换行符或空格
-VERSION=$(cat "$TARGET_DIR/version.txt" | tr -d '\n' | tr -d '\r' | xargs)
+#VERSION=$(cat "$TARGET_DIR/version.txt" | tr -d '\n' | tr -d '\r' | xargs)
+VERSION=$(head -1 "$TARGET_DIR/version.txt" | xargs)
 if [ -z "$VERSION" ]; then
     echo "错误: version.txt 内容为空"
     exit 1
