@@ -21,6 +21,6 @@ bash runnableCompress.sh <需要打包的文件夹名字>
 
 ## 3. 运行 XXX.run文件，会自动执行command.sh
 ```shell
-bash XXX.sh
+bash XXX.run
 ```
 
