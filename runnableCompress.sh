@@ -58,12 +58,12 @@ ZSTD_THREADS="${ZSTD_THREADS:-0}"
 # SPLIT_THRESHOLD_KB: data_dir 子目录超过此大小则再拆一层，默认 512MB
 SPLIT_THRESHOLD_KB="${SPLIT_THRESHOLD_KB:-$((512 * 1024))}"
 
-INSTALL_DIR=$(mktemp -d "/tmp/${VERSION}.install.XXXXXX")
+INSTALL_DIR=$(mktemp -d "$(pwd)/${VERSION}.install.XXXXXX")
 ARCHIVES_DIR="${INSTALL_DIR}/archives"
 CHECKSUM_FILE="${INSTALL_DIR}/checksums.md5"
 mkdir -p "$ARCHIVES_DIR"
 : > "$CHECKSUM_FILE"
-
+echo "CHECKSUM_FILE is set to: $CHECKSUM_FILE"
 # 4. 分片打包 (bin, command.sh, data_dir)
 echo "=> 正在分片压缩 payload (bin, data_dir, command.sh)..."
 
@@ -124,8 +124,9 @@ create_shard "00-command.tar.zst" "command.sh"
 create_shard "10-bin.tar.zst" "bin"
 create_data_dir_shards
 
-PAYLOAD_ARCHIVE=$(mktemp /tmp/payload.XXXXXX.tar)
+PAYLOAD_ARCHIVE=$(mktemp $(pwd)/payload.XXXXXX.tar)
 tar -cf "$PAYLOAD_ARCHIVE" -C "$INSTALL_DIR" archives checksums.md5
+export runnableCompress_PAYLOAD_MD5=$(md5sum "$PAYLOAD_ARCHIVE" | awk '{print $1}')
 
 # 5. 生成 .run 自解压脚本的头部逻辑
 echo "=> 正在生成自解压脚本: ${RUN_FILE} ..."
@@ -151,7 +152,7 @@ if ! command -v zstd >/dev/null 2>&1; then
 fi
 
 # 创建临时工作目录并设置退出清理钩子
-TMP_DIR=$(mktemp -d "/tmp/installer.XXXXXX")
+TMP_DIR=$(mktemp -d "$(pwd)/installer.XXXXXX")
 cleanup() {
     echo "清理临时工作空间: $TMP_DIR"
     rm -rf "$TMP_DIR"
